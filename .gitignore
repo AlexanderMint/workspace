@@ -1,0 +1,6 @@
+# JetBrains
+.idea
+
+# ENV
+.env
+!.env.example

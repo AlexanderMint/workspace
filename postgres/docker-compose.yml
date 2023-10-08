@@ -1,0 +1,30 @@
+version: '3.5'
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:16
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: ./data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+      - backend
+    restart: unless-stopped
+
+networks:
+  postgres:
+    driver: bridge
+  backend:
+    external: true
+
+volumes:
+  postgres:
+    driver: local

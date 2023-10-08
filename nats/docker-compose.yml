@@ -1,0 +1,50 @@
+version: '3.5'
+
+services:
+  nats:
+    image: nats:alpine
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    env_file:
+      - .env
+    command: "--cluster_name NATS --cluster nats://0.0.0.0:6222 --cluster_name $CLUSTER_NAME"
+    networks:
+      - nats
+      - backend
+
+  nats-1:
+    image: nats:alpine
+    command: "--cluster_name NATS --cluster nats://0.0.0.0:6222 --routes=nats://nats:6222 --cluster_name $CLUSTER_NAME --jetstream --store_dir /var/lib/nats --server_name nats_1"
+    depends_on:
+      - nats
+    env_file:
+      - .env
+    networks:
+      - nats
+    volumes:
+      - nats-1:/var/lib/nats
+
+  nats-2:
+    image: nats:alpine
+    command: "--cluster_name NATS --cluster nats://0.0.0.0:6222 --routes=nats://nats:6222 --cluster_name $CLUSTER_NAME --jetstream --store_dir /var/lib/nats --server_name nats_2"
+    depends_on:
+      - nats
+    env_file:
+      - .env
+    networks:
+      - nats
+    volumes:
+      - nats-2:/var/lib/nats
+
+volumes:
+  nats-1:
+    driver: local
+  nats-2:
+    driver: local
+
+networks:
+  nats:
+    name: nats
+  backend:
+    external: true
